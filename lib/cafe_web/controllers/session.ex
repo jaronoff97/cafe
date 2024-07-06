@@ -14,7 +14,7 @@ defmodule CafeWeb.SessionController do
       {:ok, conn} ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> redirect(to: ~p"/")
+        |> redirect(to: ~p"/items")
 
       {:error, conn} ->
         changeset = Pow.Plug.change_user(conn, conn.params["user"])
