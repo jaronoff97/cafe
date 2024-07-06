@@ -63,7 +63,8 @@ config :phoenix, :json_library, Jason
 
 config :cafe, :pow,
   user: Cafe.Users.User,
-  repo: Cafe.Repo
+  repo: Cafe.Repo,
+  web_module: CafeWeb
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

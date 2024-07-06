@@ -11,20 +11,40 @@ defmodule CafeWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :protected do
+    plug Pow.Plug.RequireAuthenticated,
+      error_handler: CafeWeb.AuthErrorHandler
+  end
+
+  pipeline :not_authenticated do
+    plug Pow.Plug.RequireNotAuthenticated,
+      error_handler: CafeWeb.AuthErrorHandler
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/" do
-    pipe_through :browser
+  scope "/", CafeWeb do
+    pipe_through [:browser, :not_authenticated]
 
-    pow_routes()
+    get "/", PageController, :home
+    get "/signup", RegistrationController, :new, as: :signup
+    post "/signup", RegistrationController, :create, as: :signup
+    get "/login", SessionController, :new, as: :login
+    post "/login", SessionController, :create, as: :login
   end
 
   scope "/", CafeWeb do
-    pipe_through :browser
-
+    pipe_through [:browser, :protected]
     get "/", PageController, :home
+    delete "/logout", SessionController, :delete, as: :logout
+    live "/items", ItemLive.Index, :index
+    live "/items/new", ItemLive.Index, :new
+    live "/items/:id/edit", ItemLive.Index, :edit
+
+    live "/items/:id", ItemLive.Show, :show
+    live "/items/:id/show/edit", ItemLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
